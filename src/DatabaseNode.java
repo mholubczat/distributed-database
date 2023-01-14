@@ -13,7 +13,9 @@
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DatabaseNode {
@@ -23,8 +25,7 @@ public class DatabaseNode {
         int port = 0;
         int key;
         int value;
-        Map<String, Integer> nodes = new HashMap<String, Integer>() {
-        };
+        List<Node> neighbours = new ArrayList<>();
 
         // Parameter scan loop
         for (int i = 0; i < args.length; i++) {
@@ -37,7 +38,7 @@ public class DatabaseNode {
                 }
                 case "-connect" -> {
                     String[] connect = args[++i].split(":");
-                    nodes.put(connect[0], Integer.parseInt(connect[1]));
+                    neighbours.add(new Node(connect[0], connect[1]));
                 }
             }
         }
