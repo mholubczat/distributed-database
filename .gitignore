@@ -34,3 +34,5 @@ bin/
 /nbdist/
 .DS_StoreS ####
 
+*.sh
+*.class

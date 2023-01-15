@@ -21,11 +21,11 @@ import java.io.*;
 public class DatabaseClient {
     public static void main(String[] args) throws IOException {
         // parameter storage
-	String gateway = null;
+        String gateway = null;
         int port = 0;
         String identifier = null;
         String command = null;
-        
+
         // Parameter scan loop
         for(int i=0; i<args.length; i++) {
             switch (args[i]) {
@@ -43,16 +43,16 @@ public class DatabaseClient {
         }
 
         // communication socket and streams
-	Socket netSocket;
-	PrintWriter out;
-	BufferedReader in;
-	try {
+        Socket netSocket;
+        PrintWriter out;
+        BufferedReader in;
+        try {
             System.out.println("Connecting with: " + gateway + " at port " + port);
-	    netSocket = new Socket(gateway, port);
-	    out = new PrintWriter(netSocket.getOutputStream(), true);
-	    in = new BufferedReader(new InputStreamReader(netSocket.getInputStream()));
+            netSocket = new Socket(gateway, port);
+            out = new PrintWriter(netSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(netSocket.getInputStream()));
             System.out.println("Connected");
-            
+
             System.out.println("Sending: " + command);
             out.println(command);
             // Read and print out the response
@@ -65,13 +65,13 @@ public class DatabaseClient {
             out.close();
             in.close();
             netSocket.close();
-	} catch (UnknownHostException e) {
-	    System.err.println("Unknown host: " + gateway + ".");
-	    System.exit(1);
-	} catch (IOException e) {
-	    System.err.println("No connection with " + gateway + ".");
-	    System.exit(1);
-	}
+        } catch (UnknownHostException e) {
+            System.err.println("Unknown host: " + gateway + ".");
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("No connection with " + gateway + ".");
+            System.exit(1);
+        }
 
     }
 }

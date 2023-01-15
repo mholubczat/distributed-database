@@ -14,20 +14,23 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class DatabaseNode {
+public class DatabaseNode extends Thread {
+    private int key;
+    private int value;
+    private ServerSocket serverSocket;
+    private int port = 0;
+    private boolean running = true;
+    private List<Socket> parents = new ArrayList<>();
+
     public static void main(String[] args) throws IOException {
+        new DatabaseNode(args).start();
+    }
+    // parameter storage
 
-        // parameter storage
-        int port = 0;
-        int key;
-        int value;
-        List<Node> neighbours = new ArrayList<>();
-
-        // Parameter scan loop
+    public DatabaseNode(String[] args) throws IOException {
+        super();
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-tcpport" -> port = Integer.parseInt(args[++i]);
@@ -38,69 +41,76 @@ public class DatabaseNode {
                 }
                 case "-connect" -> {
                     String[] connect = args[++i].split(":");
-                    neighbours.add(new Node(connect[0], connect[1]));
+                    parents.add(new Socket(connect[0], Integer.parseInt(connect[1])));
                 }
             }
         }
+    }
 
-        // communication socket and streams
-        Socket serverSocket;
-        PrintWriter out;
-        BufferedReader in;
+    public void run() {
         try {
-            System.out.println("Open connection port " + port);
-            serverSocket = new ServerSocket(port).accept();
-            out = new PrintWriter(serverSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-            System.out.println("Connected");
-            System.out.println("Receiving: ");
-            String command = in.readLine();
-            out.println(command);
+            serverSocket = new ServerSocket(port);
+            while (running) {
+                System.out.println("Server starts accepting connections on port " + port);
+                Socket socket = serverSocket.accept();
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                System.out.println("Connected to server at " + socket.getInetAddress());
 
-            // process and handle command
-            String[] commands = command.split(" ");
-            for (int i = 0; i < commands.length; i++) {
-                switch (commands[i]) {
-                    case "set-value" -> {
-                        String[] setValue = commands[++i].split(":");
-                        //TODO znajdz node i ustaw node
-                        int setKey = Integer.parseInt(setValue[0]);
-                        value = Integer.parseInt(setValue[1]);
-                    }
-                    case "get-value" -> {
-                        String getValue = commands[++i];
-                        System.out.println("key value or error if no base");
-                    }
-                    case "find-key" -> {
-                        String findKey = commands[++i];
-                        System.out.println("address and port of given key");
-                    }
-                    case "get-max" -> {
-                        System.out.println("key value pair (max value)");
-                    }
-                    case "get-min" -> {
-                        System.out.println("key value pair (min value)");
-                    }
-                    case "new-record" -> {
-                        String[] newRecord = commands[++i].split(":");
-                        key = Integer.parseInt(newRecord[0]);
-                        value = Integer.parseInt(newRecord[1]);
-                        System.out.println("OK");
-                    }
-                    case "terminate" -> {
-                        System.out.println("remove node, inform the neighbours");
-                        System.out.println("OK");
+                String command = in.readLine();
+                System.out.println("Server received command: " + command);
+                assert command != null;
+                String[] commands = command.split(" ");
+                for (int i = 0; i < commands.length; i++) {
+                    switch (commands[i]) {
+                        case "set-value" -> {
+                            String[] setValue = commands[++i].split(":");
+                            //TODO znajdz node i ustaw node
+                            int setKey = Integer.parseInt(setValue[0]);
+                            value = Integer.parseInt(setValue[1]);
+                        }
+                        case "get-value" -> {
+                            String getValue = commands[++i];
+                            System.out.println("key value or error if no base");
+                        }
+                        case "find-key" -> {
+                            String findKey = commands[++i];
+                            System.out.println("address and port of given key");
+                        }
+                        case "get-max" -> {
+                            System.out.println("key value pair (max value)");
+                        }
+                        case "get-min" -> {
+                            System.out.println("key value pair (min value)");
+                        }
+                        case "new-record" -> {
+                            String[] newRecord = commands[++i].split(":");
+                            key = Integer.parseInt(newRecord[0]);
+                            value = Integer.parseInt(newRecord[1]);
+                            System.out.println("New key: " + key);
+                            System.out.println("New value: " + value);
+                            System.out.println("OK");
+                        }
+                        case "terminate" -> {
+                            System.out.println("Server is terminating....");
+                            terminate();
+                            running = false;
+                            out.println("OK");
+                        }
                     }
                 }
             }
-
-            // Terminate - close all the streams and the socket
-            out.close();
-            in.close();
-            serverSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void terminate() throws IOException {
+        for (Socket s : parents) {
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            out.println("Terminating");
+            out.close();
+            s.close();
         }
     }
 }
