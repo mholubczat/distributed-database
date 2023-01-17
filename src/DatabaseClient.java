@@ -15,6 +15,7 @@
  *
  * SKJ, 2022/23, Łukasz Maśko
  */
+
 import java.net.*;
 import java.io.*;
 
@@ -27,7 +28,7 @@ public class DatabaseClient {
         String command = null;
 
         // Parameter scan loop
-        for(int i=0; i<args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-gateway":
                     String[] gatewayArray = args[++i].split(":");
@@ -37,8 +38,8 @@ public class DatabaseClient {
                 case "-operation":
                     break;
                 default:
-                    if(command == null) command = args[i];
-                    else if(! "TERMINATE".equals(command)) command += " " + args[i];
+                    if (command == null) command = args[i];
+                    else if (!"TERMINATE".equals(command)) command += " " + args[i];
             }
         }
 
@@ -60,7 +61,6 @@ public class DatabaseClient {
             while ((response = in.readLine()) != null) {
                 System.out.println(response);
             }
-
             // Terminate - close all the streams and the socket
             out.close();
             in.close();
