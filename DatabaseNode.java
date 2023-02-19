@@ -27,8 +27,6 @@ public class DatabaseNode extends Thread {
     public static void main(String[] args) throws IOException {
         new DatabaseNode(args).start();
     }
-    // parameter storage
-
 
     public DatabaseNode(String[] args) throws IOException {
         super();
@@ -36,15 +34,17 @@ public class DatabaseNode extends Thread {
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "-tcpport" -> {
+                case "-tcpport": {
                     port = Integer.parseInt(args[++i]);
                 }
-                case "-record" -> {
+                break;
+                case "-record": {
                     String[] record = args[++i].split(":");
                     key = Integer.parseInt(record[0]);
                     value = Integer.parseInt(record[1]);
                 }
-                case "-connect" -> {
+                break;
+                case "-connect": {
                     String nodeId = args[++i];
                     nodeId = nodeId.replaceAll("localhost", "127.0.0.1");
                     neighbours.add(nodeId);
@@ -59,6 +59,7 @@ public class DatabaseNode extends Thread {
                         throw new RuntimeException(e);
                     }
                 }
+                break;
             }
         }
     }

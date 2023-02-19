@@ -4,6 +4,12 @@ public class Query {
     private boolean open = true;
     private String result;
     private Integer resultInt;
+
+    public void setResultKey(Integer resultKey) {
+        this.resultKey = resultKey;
+    }
+
+    private Integer resultKey;
     private final ArrayList<String> involved = new ArrayList<>();
 
     public Query(String involved) {
@@ -23,10 +29,6 @@ public class Query {
         this.notifyAll();
     }
 
-    public boolean isOpen() {
-        return open;
-    }
-
     public void addInvolved(String involved){
         this.involved.add(involved);
     }
@@ -43,5 +45,9 @@ public class Query {
 
     public Integer getResultInt() {
         return this.resultInt;
+    }
+
+    public Integer getResultKey() {
+        return this.resultKey;
     }
 }
